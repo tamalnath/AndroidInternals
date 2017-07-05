@@ -6,7 +6,6 @@ import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -49,7 +48,7 @@ final class Utils {
             try {
                 map.put(name, (T) field.get(null));
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                Log.d(TAG, "Field: " + field + " Error: " + e.getMessage());
             }
         }
         return map;
@@ -79,22 +78,20 @@ final class Utils {
                     return name;
                 }
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                Log.d(TAG, "Field: " + field + " Error: " + e.getMessage());
             }
         }
         return null;
     }
 
-    static Map<String, Object> findProperties(Object object) {
-        return findProperties(object, "(?:is|get)(.*)");
+    static Map<String, Object> findMethods(@NonNull Object object) {
+        return findMethods(object, null, "(?:is|get)(.*)");
     }
 
-    static Map<String, Object> findProperties(Object object, String regex) {
-        Map<String, Object> map = new TreeMap<>();
-        if (object == null) {
-            return map;
-        }
-        Pattern pattern = Pattern.compile(regex);
+    @SuppressWarnings("unchecked")
+    static <T> Map<String, T> findMethods(@NonNull Object object, @Nullable Class<T> returnType, @Nullable String regex) {
+        Map<String, T> map = new TreeMap<>();
+        Pattern pattern = regex == null ? null : Pattern.compile(regex);
         for (Method method : object.getClass().getMethods()) {
             boolean isPublic = Modifier.isPublic(method.getModifiers());
             boolean isStatic = Modifier.isStatic(method.getModifiers());
@@ -102,21 +99,23 @@ final class Utils {
                     || Object.class == method.getDeclaringClass()) {
                 continue;
             }
-            String name = method.getName();
-            Matcher matcher = pattern.matcher(name);
-            if (!matcher.find()) {
+            if (returnType != null && method.getReturnType() != returnType) {
                 continue;
             }
-            if (matcher.groupCount() == 1) {
-                name = matcher.group(1);
+            String name = method.getName();
+            if (pattern != null) {
+                Matcher matcher = pattern.matcher(name);
+                if (!matcher.find()) {
+                    continue;
+                }
+                if (matcher.groupCount() == 1) {
+                    name = matcher.group(1);
+                }
             }
             try {
-                Object value = method.invoke(object);
-                map.put(name, value);
-            } catch (IllegalAccessException e) {
+                map.put(name, (T) method.invoke(object));
+            } catch (ReflectiveOperationException e) {
                 Log.d(TAG, "Method: " + method + " Error: " + e.getMessage());
-            } catch (InvocationTargetException e) {
-                Log.e(TAG, "Method: " + method + " Error: " + e.getMessage());
             }
         }
         return map;
@@ -243,4 +242,5 @@ final class Utils {
             map.put(key, findConstant(classType, value, regex));
         }
     }
+
 }

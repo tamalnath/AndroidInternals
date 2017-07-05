@@ -130,8 +130,7 @@ public class MainActivity extends AppCompatActivity
         PagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
             fragments = new Fragment[]{
-                    new BuildFragment(),
-                    new BatteryFragment(),
+                    new GeneralFragment(),
                     new FontsFragment(),
                     new SensorsFragment(),
                     new LocationFragment(),

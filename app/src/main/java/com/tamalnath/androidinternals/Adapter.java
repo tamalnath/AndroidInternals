@@ -43,6 +43,10 @@ class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return dataList.get(position).getLayout();
     }
 
+    public List<Data> getDataList() {
+        return dataList;
+    }
+
     void addData(Data data) {
         dataList.add(data);
     }

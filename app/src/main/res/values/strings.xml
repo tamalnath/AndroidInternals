@@ -7,7 +7,15 @@
     <string name="value">Value</string>
     <string name="action_settings">Settings</string>
 
-    <string name="fragment_build">Build</string>
+    <string name="fragment_general">General</string>
+
+    <string name="general_build">Build</string>
+    <string name="general_battery">Battery</string>
+    <string name="general_environment">Environment Variables</string>
+    <string name="general_properties">System Properties</string>
+
+    <string name="sensor_unit_deg">&#176;</string>
+
     <string name="fragment_fonts">Fonts</string>
     <string name="fragment_sensors">Sensors</string>
     <string name="fragment_battery">Battery</string>
